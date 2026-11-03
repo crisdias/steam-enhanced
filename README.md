@@ -6,6 +6,7 @@ Extensão de Chrome que acrescenta dados às páginas de jogo da Steam e resgata
 
 **Na página do jogo**
 
+- **Preço no topo:** repete à direita do botão `Community Hub` o primeiro preço da área de compra, lido da própria página, então inclui descontos da sua conta.
 - **Percentual nas avaliações:** mostra o percentual de positivas ao lado das linhas de avaliação da Steam.
 - **Todas as avaliações:** acrescenta a linha `All Reviews`, com o total em todos os idiomas e quantas avaliações o filtro da Steam oculta.
 - **Última atualização:** acrescenta a linha `Last Update`, com a data em que o build público mudou e há quantos dias. O link abre a nota da Steam ou, quando não há nota até 7 dias da data, as notas do jogo no SteamDB.
