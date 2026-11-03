@@ -1,0 +1,74 @@
+(async function () {
+  const { reviewScoreClass, percentFromTooltip, daysAgoLabel, mountStatsPanel } =
+    globalThis.SteamEnhanced;
+
+  const appid = Number(location.pathname.match(/^\/app\/(\d+)/)?.[1]);
+  if (!appid) return;
+
+  const number = new Intl.NumberFormat("en-US");
+  const shortDate = new Intl.DateTimeFormat("en-GB", { dateStyle: "short" });
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function percentSpan(percent) {
+    return element("span", "sac-percent responsive_hidden", `${percent}%`);
+  }
+
+  for (const row of document.querySelectorAll("#userReviews .user_reviews_summary_row")) {
+    const percent = percentFromTooltip(row.getAttribute("data-tooltip-html"));
+    const summary = row.querySelector(".game_review_summary");
+    if (percent && summary) summary.after(" ", percentSpan(percent));
+  }
+
+  const response = await chrome.runtime.sendMessage({ type: "game-info", appid });
+  if (!response?.ok) return;
+  const { reviews, lastUpdate } = response.data;
+
+  if (reviews) {
+    const anchor = document.querySelector("#userReviews");
+    if (anchor) {
+      const hidden = reviews.hidden > 0 ? `, ${number.format(reviews.hidden)} hidden` : "";
+      const summary = element("div", "summary column");
+      summary.append(
+        element("span", `game_review_summary ${reviewScoreClass(reviews.score)}`, reviews.label),
+        " ",
+        percentSpan(reviews.percentPositive),
+        " ",
+        element("span", "responsive_hidden", `(${number.format(reviews.total)}${hidden})`)
+      );
+      const row = element("a", "user_reviews_summary_row sac-row");
+      row.href = "#app_reviews_hash";
+      row.append(element("div", "subtitle column all", "All Reviews:"), summary);
+      anchor.append(row);
+    }
+  }
+
+  if (lastUpdate) {
+    const anchor = document.querySelector(".glance_ctn .release_date");
+    if (anchor) {
+      const date = element(
+        "a",
+        "sac-date",
+        shortDate.format(new Date(lastUpdate.timestamp * 1000))
+      );
+      date.href = lastUpdate.url;
+      date.title = lastUpdate.title;
+      const summary = element("div", "summary column sac-update");
+      summary.append(
+        date,
+        " ",
+        element("span", "sac-days", `(${daysAgoLabel(lastUpdate.timestamp, Date.now())})`)
+      );
+      const row = element("div", "dev_row sac-row");
+      row.append(element("div", "subtitle column", "Last Update:"), summary);
+      anchor.after(row);
+    }
+  }
+
+  await mountStatsPanel({ appid, lastUpdate });
+})();

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Steam Enhanced",
+  "version": "0.1.0",
+  "description": "Avaliações totais e última atualização na página do jogo, e resgate dos itens grátis da loja de pontos.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://api.steampowered.com/*",
+    "https://store.steampowered.com/*",
+    "https://steamcharts.com/*",
+    "https://api.steamcmd.net/*"
+  ],
+  "background": {
+    "service_worker": "src/worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://store.steampowered.com/app/*"],
+      "js": ["src/lib.js", "src/stats-panel.js", "src/game-page.js"],
+      "css": ["src/style.css"]
+    },
+    {
+      "matches": ["https://store.steampowered.com/points*"],
+      "js": ["src/lib.js", "src/points-shop.js"],
+      "css": ["src/style.css"]
+    }
+  ]
+}
