@@ -29,7 +29,9 @@
     };
   }
 
+  // Nota 0 é jogo sem avaliações ou com poucas demais para a Steam dar nota.
   function reviewScoreClass(score) {
+    if (!score) return "not_enough_reviews";
     if (score >= 6) return "positive";
     return score === 5 ? "mixed" : "negative";
   }

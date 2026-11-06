@@ -45,6 +45,7 @@ test("escolhe a cor da nota como a Steam", () => {
   assert.strictEqual(lib.reviewScoreClass(8), "positive");
   assert.strictEqual(lib.reviewScoreClass(5), "mixed");
   assert.strictEqual(lib.reviewScoreClass(2), "negative");
+  assert.strictEqual(lib.reviewScoreClass(0), "not_enough_reviews");
 });
 
 test("sem resumo de avaliações, devolve nulo", () => {

@@ -19,7 +19,12 @@
     return element("span", "sac-percent responsive_hidden", `${percent}%`);
   }
 
-  for (const row of document.querySelectorAll("#userReviews .user_reviews_summary_row")) {
+  const steamRows = [...document.querySelectorAll("#userReviews .user_reviews_summary_row")];
+  const steamShowsAll = steamRows.some(
+    (row) => row.querySelector(".subtitle")?.textContent.trim() === "All Reviews:"
+  );
+
+  for (const row of steamRows) {
     const percent = percentFromTooltip(row.getAttribute("data-tooltip-html"));
     const summary = row.querySelector(".game_review_summary");
     if (percent && summary) summary.after(" ", percentSpan(percent));
@@ -75,16 +80,17 @@
   if (!response?.ok) return;
   const { reviews, lastUpdate } = response.data;
 
-  if (reviews) {
+  if (reviews && !(steamShowsAll && reviews.hidden === 0)) {
     const anchor = document.querySelector("#userReviews");
     if (anchor) {
       const hidden = reviews.hidden > 0 ? `, ${number.format(reviews.hidden)} hidden` : "";
       const summary = element("div", "summary column");
       summary.append(
         element("span", `game_review_summary ${reviewScoreClass(reviews.score)}`, reviews.label),
-        " ",
-        percentSpan(reviews.percentPositive),
-        " ",
+        " "
+      );
+      if (reviews.score) summary.append(percentSpan(reviews.percentPositive), " ");
+      summary.append(
         element("span", "responsive_hidden", `(${number.format(reviews.total)}${hidden})`)
       );
       const row = element("a", "user_reviews_summary_row sac-row");
